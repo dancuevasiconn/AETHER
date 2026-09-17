@@ -1,0 +1,390 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aether.local/schemas/architecture-v0.1.schema.json",
+  "title": "AETHER Physical Contract v0.1",
+  "description": "Physical shape of one AETHER Architecture document.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "architecture"],
+  "properties": {
+    "schemaVersion": { "const": "0.1" },
+    "architecture": { "$ref": "#/$defs/Architecture" }
+  },
+  "$defs": {
+    "Id": { "type": "string" },
+    "IdArray": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/Id" }
+    },
+    "NonEmptyIdArray": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/Id" }
+    },
+    "ArchitectureLevel": {
+      "type": "string",
+      "enum": ["BUSINESS", "APPLICATION", "TECHNOLOGY"]
+    },
+    "ApsLayer": {
+      "type": "string",
+      "enum": [
+        "EXPERIENCE_CUSTOMER_INTERACTION",
+        "GOVERNANCE_POLICIES_DECISIONS",
+        "INTEGRATION_ORCHESTRATION",
+        "CORE",
+        "SATELLITES",
+        "SECURITY",
+        "OBSERVABILITY_CONTROL",
+        "DATA_ANALYTICS"
+      ]
+    },
+    "JsonValue": {
+      "oneOf": [
+        { "type": "null" },
+        { "type": "boolean" },
+        { "type": "number" },
+        { "type": "string" },
+        {
+          "type": "array",
+          "items": { "$ref": "#/$defs/JsonValue" }
+        },
+        { "$ref": "#/$defs/JsonObject" }
+      ]
+    },
+    "JsonObject": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/JsonValue" }
+    },
+    "ProcessFlowReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["flowId", "kind"],
+      "properties": {
+        "flowId": { "$ref": "#/$defs/Id" },
+        "kind": { "type": "string", "enum": ["initiates", "uses"] }
+      }
+    },
+    "AffectedObjectReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["entityType", "entityId"],
+      "properties": {
+        "entityType": {
+          "type": "string",
+          "enum": [
+            "Architecture",
+            "BusinessCapability",
+            "Element",
+            "Relationship",
+            "Layer",
+            "Process",
+            "DataObject",
+            "Flow",
+            "FlowSegment",
+            "FlowFamily",
+            "Role",
+            "Position",
+            "Responsibility",
+            "BusinessRule",
+            "RuleImplementation",
+            "DecisionReference"
+          ]
+        },
+        "entityId": { "$ref": "#/$defs/Id" }
+      }
+    },
+    "Architecture": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "modelVersion", "metadata"],
+      "properties": {
+        "id": { "$ref": "#/$defs/Id" },
+        "name": { "type": "string" },
+        "modelVersion": { "type": "string" },
+        "metadata": { "$ref": "#/$defs/JsonObject" },
+        "description": { "type": "string" },
+        "businessCapabilities": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/BusinessCapability" }
+        },
+        "elements": { "type": "array", "items": { "$ref": "#/$defs/Element" } },
+        "relationships": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Relationship" }
+        },
+        "layers": { "type": "array", "items": { "$ref": "#/$defs/Layer" } },
+        "processes": { "type": "array", "items": { "$ref": "#/$defs/Process" } },
+        "dataObjects": { "type": "array", "items": { "$ref": "#/$defs/DataObject" } },
+        "flows": { "type": "array", "items": { "$ref": "#/$defs/Flow" } },
+        "flowSegments": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/FlowSegment" }
+        },
+        "flowFamilies": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/FlowFamily" }
+        },
+        "roles": { "type": "array", "items": { "$ref": "#/$defs/Role" } },
+        "positions": { "type": "array", "items": { "$ref": "#/$defs/Position" } },
+        "responsibilities": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Responsibility" }
+        },
+        "businessRules": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/BusinessRule" }
+        },
+        "ruleImplementations": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/RuleImplementation" }
+        },
+        "decisionReferences": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/DecisionReference" }
+        }
+      }
+    },
+    "BusinessCapability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name"],
+      "properties": {
+        "id": { "$ref": "#/$defs/Id" },
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "processIds": { "$ref": "#/$defs/IdArray" },
+        "flowFamilyIds": { "$ref": "#/$defs/IdArray" },
+        "roleIds": { "$ref": "#/$defs/IdArray" }
+      }
+    },
+    "Element": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "elementType"],
+      "properties": {
+        "id": { "$ref": "#/$defs/Id" },
+        "name": { "type": "string" },
+        "elementType": { "type": "string" },
+        "description": { "type": "string" },
+        "layerId": { "$ref": "#/$defs/Id" },
+        "architectureLevel": { "$ref": "#/$defs/ArchitectureLevel" }
+      }
+    },
+    "Relationship": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "relationshipType", "sourceElementId", "targetElementId"],
+      "properties": {
+        "id": { "$ref": "#/$defs/Id" },
+        "relationshipType": { "type": "string" },
+        "sourceElementId": { "$ref": "#/$defs/Id" },
+        "targetElementId": { "$ref": "#/$defs/Id" },
+        "name": { "type": "string" },
+        "description": { "type": "string" }
+      }
+    },
+    "Layer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name"],
+      "properties": {
+        "id": { "$ref": "#/$defs/Id" },
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "code": { "type": "string" },
+        "order": { "type": "number" },
+        "parentLayerId": { "$ref": "#/$defs/Id" },
+        "apsLayer": { "$ref": "#/$defs/ApsLayer" }
+      }
+    },
+    "Process": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name"],
+      "properties": {
+        "id": { "$ref": "#/$defs/Id" },
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "dataObjectIds": { "$ref": "#/$defs/IdArray" },
+        "flowReferences": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ProcessFlowReference" }
+        },
+        "roleIds": { "$ref": "#/$defs/IdArray" },
+        "elementIds": { "$ref": "#/$defs/IdArray" }
+      }
+    },
+    "DataObject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name"],
+      "properties": {
+        "id": { "$ref": "#/$defs/Id" },
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "domain": { "type": "string" },
+        "ownership": { "type": "string" },
+        "schemaReference": { "type": "string" },
+        "classification": { "type": "string" },
+        "elementIds": { "$ref": "#/$defs/IdArray" }
+      }
+    },
+    "Flow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "description",
+        "flowFamilyId",
+        "dataObjectIds",
+        "startElementId",
+        "endElementId",
+        "flowSegmentIds"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/Id" },
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "flowFamilyId": { "$ref": "#/$defs/Id" },
+        "dataObjectIds": { "$ref": "#/$defs/NonEmptyIdArray" },
+        "startElementId": { "$ref": "#/$defs/Id" },
+        "endElementId": { "$ref": "#/$defs/Id" },
+        "flowSegmentIds": { "$ref": "#/$defs/NonEmptyIdArray" }
+      }
+    },
+    "FlowSegment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "flowId",
+        "sequence",
+        "sourceElementId",
+        "targetElementId",
+        "dataObjectIds"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/Id" },
+        "flowId": { "$ref": "#/$defs/Id" },
+        "sequence": { "type": "integer", "minimum": 1 },
+        "sourceElementId": { "$ref": "#/$defs/Id" },
+        "targetElementId": { "$ref": "#/$defs/Id" },
+        "dataObjectIds": { "$ref": "#/$defs/NonEmptyIdArray" },
+        "relationshipId": { "$ref": "#/$defs/Id" },
+        "name": { "type": "string" },
+        "description": { "type": "string" }
+      }
+    },
+    "FlowFamily": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name"],
+      "properties": {
+        "id": { "$ref": "#/$defs/Id" },
+        "name": { "type": "string" },
+        "description": { "type": "string" }
+      }
+    },
+    "Role": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name"],
+      "properties": {
+        "id": { "$ref": "#/$defs/Id" },
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "positionIds": { "$ref": "#/$defs/IdArray" },
+        "flowIds": { "$ref": "#/$defs/IdArray" },
+        "flowSegmentIds": { "$ref": "#/$defs/IdArray" },
+        "dataObjectIds": { "$ref": "#/$defs/IdArray" }
+      }
+    },
+    "Position": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name"],
+      "properties": {
+        "id": { "$ref": "#/$defs/Id" },
+        "name": { "type": "string" },
+        "description": { "type": "string" }
+      }
+    },
+    "Responsibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name"],
+      "properties": {
+        "id": { "$ref": "#/$defs/Id" },
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "businessCapabilityIds": { "$ref": "#/$defs/IdArray" },
+        "processIds": { "$ref": "#/$defs/IdArray" },
+        "roleIds": { "$ref": "#/$defs/IdArray" },
+        "elementIds": { "$ref": "#/$defs/IdArray" }
+      }
+    },
+    "BusinessRule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "logicalLayerId"],
+      "properties": {
+        "id": { "$ref": "#/$defs/Id" },
+        "name": { "type": "string" },
+        "logicalLayerId": { "$ref": "#/$defs/Id" },
+        "description": { "type": "string" },
+        "processIds": { "$ref": "#/$defs/IdArray" },
+        "dataObjectIds": { "$ref": "#/$defs/IdArray" },
+        "flowIds": { "$ref": "#/$defs/IdArray" },
+        "flowSegmentIds": { "$ref": "#/$defs/IdArray" },
+        "responsibilityIds": { "$ref": "#/$defs/IdArray" },
+        "ownerRoleIds": { "$ref": "#/$defs/IdArray" }
+      }
+    },
+    "RuleImplementation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "businessRuleId", "implementationType"],
+      "properties": {
+        "id": { "$ref": "#/$defs/Id" },
+        "businessRuleId": { "$ref": "#/$defs/Id" },
+        "implementationType": { "type": "string" },
+        "executingElementIds": { "$ref": "#/$defs/IdArray" },
+        "executingRoleIds": { "$ref": "#/$defs/IdArray" },
+        "actualLayerId": { "$ref": "#/$defs/Id" },
+        "architectureLevel": { "$ref": "#/$defs/ArchitectureLevel" },
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "status": { "type": "string" },
+        "mechanism": { "type": "string" }
+      },
+      "anyOf": [
+        {
+          "required": ["executingElementIds"],
+          "properties": { "executingElementIds": { "type": "array", "minItems": 1 } }
+        },
+        {
+          "required": ["executingRoleIds"],
+          "properties": { "executingRoleIds": { "type": "array", "minItems": 1 } }
+        }
+      ]
+    },
+    "DecisionReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "title", "status", "reference", "affectedObjects"],
+      "properties": {
+        "id": { "$ref": "#/$defs/Id" },
+        "title": { "type": "string" },
+        "status": { "type": "string" },
+        "reference": { "type": "string" },
+        "affectedObjects": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/AffectedObjectReference" }
+        },
+        "description": { "type": "string" }
+      }
+    }
+  }
+}
