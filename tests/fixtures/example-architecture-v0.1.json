@@ -1,0 +1,162 @@
+{
+  "schemaVersion": "0.1",
+  "architecture": {
+    "id": "example architecture",
+    "name": "Example Architecture",
+    "modelVersion": "0.1",
+    "description": "Neutral loading fixture",
+    "metadata": { "purpose": "Loading tests", "notes": [null, { "reviewed": true }] },
+    "businessCapabilities": [
+      {
+        "id": "capability-1",
+        "name": "Example Capability",
+        "processIds": ["process-1"],
+        "flowFamilyIds": ["family-1"],
+        "roleIds": ["role-1"]
+      }
+    ],
+    "layers": [
+      { "id": "governance", "name": "Governance", "apsLayer": "GOVERNANCE_POLICIES_DECISIONS" },
+      { "id": "policy", "name": "Policy", "parentLayerId": "governance" },
+      { "id": "core", "name": "Core", "apsLayer": "CORE", "order": 1.5 }
+    ],
+    "elements": [
+      {
+        "id": "entry",
+        "name": "Entry Component",
+        "elementType": "EXAMPLE_COMPONENT",
+        "layerId": "core",
+        "architectureLevel": "APPLICATION"
+      },
+      { "id": "middle", "name": "Core Component", "elementType": "EXAMPLE_COMPONENT" },
+      { "id": "end", "name": "End Component", "elementType": "EXAMPLE_COMPONENT" }
+    ],
+    "relationships": [
+      {
+        "id": "relationship-1",
+        "relationshipType": "EXAMPLE_DEPENDENCY",
+        "sourceElementId": "entry",
+        "targetElementId": "middle"
+      }
+    ],
+    "processes": [
+      {
+        "id": "process-1",
+        "name": "Example Process",
+        "dataObjectIds": ["request"],
+        "flowReferences": [
+          { "flowId": "flow-1", "kind": "initiates" },
+          { "flowId": "flow-1", "kind": "uses" }
+        ],
+        "roleIds": ["role-1"],
+        "elementIds": ["entry"]
+      }
+    ],
+    "dataObjects": [
+      {
+        "id": "request",
+        "name": "Request",
+        "domain": "Example",
+        "ownership": "Example ownership",
+        "schemaReference": "Example reference",
+        "classification": "Example classification",
+        "elementIds": ["entry"]
+      }
+    ],
+    "flowFamilies": [{ "id": "family-1", "name": "Example Family" }],
+    "flows": [
+      {
+        "id": "flow-1",
+        "name": "Example Flow",
+        "description": "Linear end-to-end example",
+        "flowFamilyId": "family-1",
+        "dataObjectIds": ["request"],
+        "startElementId": "entry",
+        "endElementId": "end",
+        "flowSegmentIds": ["segment-1", "segment-2"]
+      }
+    ],
+    "flowSegments": [
+      {
+        "id": "segment-1",
+        "flowId": "flow-1",
+        "sequence": 1,
+        "sourceElementId": "entry",
+        "targetElementId": "middle",
+        "dataObjectIds": ["request"],
+        "relationshipId": "relationship-1"
+      },
+      {
+        "id": "segment-2",
+        "flowId": "flow-1",
+        "sequence": 2,
+        "sourceElementId": "middle",
+        "targetElementId": "end",
+        "dataObjectIds": ["request"]
+      }
+    ],
+    "roles": [
+      {
+        "id": "role-1",
+        "name": "Example Role",
+        "positionIds": ["position-1"],
+        "flowIds": ["flow-1"],
+        "flowSegmentIds": ["segment-1"],
+        "dataObjectIds": ["request"]
+      }
+    ],
+    "positions": [{ "id": "position-1", "name": "Example Position" }],
+    "responsibilities": [
+      {
+        "id": "responsibility-1",
+        "name": "Example Responsibility",
+        "businessCapabilityIds": ["capability-1"],
+        "processIds": ["process-1"],
+        "roleIds": ["role-1"],
+        "elementIds": ["entry"]
+      }
+    ],
+    "businessRules": [
+      {
+        "id": "rule-1",
+        "name": "Example Rule",
+        "logicalLayerId": "policy",
+        "processIds": ["process-1"],
+        "dataObjectIds": ["request"],
+        "flowIds": ["flow-1"],
+        "flowSegmentIds": ["segment-1"],
+        "responsibilityIds": ["responsibility-1"],
+        "ownerRoleIds": ["role-1"]
+      }
+    ],
+    "ruleImplementations": [
+      {
+        "id": "implementation-1",
+        "businessRuleId": "rule-1",
+        "implementationType": "EXAMPLE_IMPLEMENTATION",
+        "executingElementIds": ["entry"],
+        "executingRoleIds": ["role-1"],
+        "actualLayerId": "core",
+        "architectureLevel": "TECHNOLOGY",
+        "status": "example",
+        "mechanism": "Example mechanism"
+      }
+    ],
+    "decisionReferences": [
+      {
+        "id": "decision-1",
+        "title": "Example Decision",
+        "status": "example",
+        "reference": "Example reference",
+        "affectedObjects": [
+          { "entityType": "Architecture", "entityId": "example architecture" },
+          { "entityType": "BusinessCapability", "entityId": "capability-1" },
+          { "entityType": "Element", "entityId": "entry" },
+          { "entityType": "Process", "entityId": "process-1" },
+          { "entityType": "Role", "entityId": "role-1" },
+          { "entityType": "BusinessRule", "entityId": "rule-1" }
+        ]
+      }
+    ]
+  }
+}
