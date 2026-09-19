@@ -3,3 +3,4 @@ export * from "./validation/index.js";
 export * from "./loading/index.js";
 export * from "./graph/index.js";
 export * from "./visualization/index.js";
+export * from "./visualization-engine/index.js";

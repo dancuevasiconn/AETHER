@@ -7,19 +7,29 @@
     "node": ">=24 <25"
   },
   "scripts": {
+    "dev": "vite",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --passWithNoTests",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "build": "tsc --project tsconfig.build.json"
+    "build:core": "tsc --project tsconfig.build.json",
+    "build:web": "tsc --project tsconfig.web.json && vite build --outDir web-dist",
+    "build": "npm run build:core && npm run build:web"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
     "ajv": "^8.20.0",
     "eslint": "^10.9.1",
     "prettier": "^3.9.6",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.69.0",
+    "vite": "^8.3.0",
     "vitest": "^4.1.11"
+  },
+  "dependencies": {
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
   }
 }
