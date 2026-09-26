@@ -1,6 +1,22 @@
-import type { InformationDescriptor } from "../visualization/index.js";
+import type { NavigationOption } from "../navigation/index.js";
+import type { EntityReference, InformationDescriptor } from "../visualization/index.js";
 
-export function InformationCard({ descriptor }: { readonly descriptor?: InformationDescriptor }) {
+export interface InformationCardProps {
+  readonly descriptor?: InformationDescriptor;
+  readonly navigationOptions?: readonly NavigationOption[];
+  readonly onOpen?: (reference: EntityReference) => void;
+  readonly onFocus?: (reference: EntityReference) => void;
+  readonly onOpenContext?: (reference: EntityReference) => void;
+  readonly onOpenRelated?: (option: NavigationOption) => void;
+}
+export function InformationCard({
+  descriptor,
+  navigationOptions = [],
+  onOpen,
+  onFocus,
+  onOpenContext,
+  onOpenRelated,
+}: InformationCardProps) {
   if (!descriptor)
     return (
       <section className="information-card" aria-label="Information">
@@ -13,6 +29,11 @@ export function InformationCard({ descriptor }: { readonly descriptor?: Informat
       <h2>{descriptor.label ?? descriptor.reference.entityId}</h2>
       <p className="entity-type">{descriptor.reference.entityType}</p>
       {descriptor.description && <p>{descriptor.description}</p>}
+      <div className="information-actions">
+        <button onClick={() => onOpen?.(descriptor.reference)}>Open</button>
+        <button onClick={() => onFocus?.(descriptor.reference)}>Focus</button>
+        <button onClick={() => onOpenContext?.(descriptor.reference)}>Show context</button>
+      </div>
       <dl>
         <dt>Position</dt>
         <dd>
@@ -26,6 +47,24 @@ export function InformationCard({ descriptor }: { readonly descriptor?: Informat
         <dt>Decisions</dt>
         <dd>{descriptor.decisions.length}</dd>
       </dl>
+      {navigationOptions.length > 0 && (
+        <details>
+          <summary>Related destinations</summary>
+          <ul className="related-list">
+            {navigationOptions.map((option) => (
+              <li
+                key={`${option.edgeKey}:${option.target.reference.entityType}:${option.target.reference.entityId}`}
+              >
+                <button onClick={() => onOpenRelated?.(option)}>
+                  {option.direction === "inverse" ? "←" : "→"} {option.target.reference.entityType}:{" "}
+                  {option.target.reference.entityId}
+                </button>
+                <small>{option.edgeType}</small>
+              </li>
+            ))}
+          </ul>
+        </details>
+      )}
       {descriptor.route && (
         <details>
           <summary>Flow route</summary>

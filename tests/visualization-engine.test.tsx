@@ -280,6 +280,10 @@ describe("UI shell boundaries", () => {
     expect(markup).toContain("canvas-panel");
     expect(markup).toContain("right-panel");
     expect(markup).toContain("Flow families");
+    expect(markup).toContain("Semantic navigation");
+    expect(markup).toContain("Navigation journey");
+    expect(markup).toContain("Architecture Overview");
+    expect(markup).toContain("Home");
   });
 
   it("renders InformationDescriptor in the shell", () => {
@@ -287,9 +291,11 @@ describe("UI shell boundaries", () => {
     const visualization = view({ selection: entry });
     const information = getInformationDescriptor(g, visualization, entry);
     if (!information.success) throw new Error(JSON.stringify(information.error));
-    expect(renderToStaticMarkup(<InformationCard descriptor={information.value} />)).toContain(
-      "Entry Component",
-    );
+    const markup = renderToStaticMarkup(<InformationCard descriptor={information.value} />);
+    expect(markup).toContain("Entry Component");
+    expect(markup).toContain("Open");
+    expect(markup).toContain("Focus");
+    expect(markup).toContain("Show context");
   });
 
   it("renders an accessible empty Information Card", () => {

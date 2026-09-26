@@ -34,8 +34,8 @@ button.active {
   height: 100vh;
   display: grid;
   grid-template-columns: minmax(180px, 230px) minmax(0, 1fr) minmax(220px, 300px);
-  grid-template-rows: auto minmax(0, 1fr);
-  grid-template-areas: "header header header" "left canvas right";
+  grid-template-rows: auto auto minmax(0, 1fr);
+  grid-template-areas: "header header header" "breadcrumbs breadcrumbs breadcrumbs" "left canvas right";
 }
 .app-shell > header {
   grid-area: header;
@@ -57,9 +57,54 @@ button.active {
   margin: 0 0 0.2rem;
   color: #a9c8ff;
 }
-.toolbar {
+.toolbar,
+.history-controls,
+.information-actions {
   display: flex;
   gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.history-controls button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.breadcrumbs {
+  grid-area: breadcrumbs;
+  padding: 0.4rem 0.8rem;
+  background: #e7edf6;
+  border-bottom: 1px solid #cbd5e1;
+  white-space: nowrap;
+  overflow: auto;
+}
+.breadcrumbs button {
+  padding: 0.25rem 0.4rem;
+  background: transparent;
+  border-color: transparent;
+}
+.breadcrumbs button[aria-current="page"] {
+  font-weight: 800;
+  border-bottom-color: #173d78;
+}
+.navigation-notice {
+  font-size: 0.78rem;
+  padding: 0.5rem;
+  border-left: 3px solid #a13a00;
+  background: #fff4ed;
+}
+.information-actions {
+  margin: 0.75rem 0;
+}
+.related-list {
+  list-style: none;
+  padding: 0;
+}
+.related-list li {
+  display: grid;
+  gap: 0.15rem;
+  margin: 0.4rem 0;
+}
+.related-list small {
+  color: #667085;
 }
 .left-panel,
 .right-panel {
@@ -249,8 +294,8 @@ button.active {
 @media (max-width: 850px) {
   .app-shell {
     grid-template-columns: 180px minmax(0, 1fr);
-    grid-template-rows: auto minmax(0, 1fr) auto;
-    grid-template-areas: "header header" "left canvas" "right right";
+    grid-template-rows: auto auto minmax(0, 1fr) auto;
+    grid-template-areas: "header header" "breadcrumbs breadcrumbs" "left canvas" "right right";
   }
   .right-panel {
     border-left: 0;
@@ -265,8 +310,8 @@ button.active {
     height: auto;
     min-height: 100vh;
     grid-template-columns: 1fr;
-    grid-template-rows: auto auto 65vh auto;
-    grid-template-areas: "header" "left" "canvas" "right";
+    grid-template-rows: auto auto auto 65vh auto;
+    grid-template-areas: "header" "breadcrumbs" "left" "canvas" "right";
   }
   .app-shell > header {
     align-items: flex-start;
