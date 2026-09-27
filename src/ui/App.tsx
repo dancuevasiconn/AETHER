@@ -1,4 +1,11 @@
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createDecisionService } from "../decisions-governance/index.js";
+import type {
+  DecisionDetailDescriptor,
+  DecisionResolutionContext,
+  DecisionService,
+} from "../decisions-governance/index.js";
+import type { DecisionReference } from "../domain/index.js";
 import type { GraphEngine } from "../graph/index.js";
 import {
   assessNavigationProjection,
@@ -26,14 +33,29 @@ import { VisualizationCanvas } from "./VisualizationCanvas.js";
 
 const initialViewState: ViewState = { viewId: "browser-view", viewType: "FULL_MAP" };
 const asTarget = (reference: EntityReference): NavigationTarget => ({ reference });
-export function App({ graph }: { readonly graph: GraphEngine }) {
+export interface AppProps {
+  readonly graph: GraphEngine;
+  readonly decisionService?: DecisionService;
+  readonly getDecisionResolutionContext?: (
+    reference: DecisionReference,
+  ) => DecisionResolutionContext | undefined;
+}
+
+export function App({ graph, decisionService, getDecisionResolutionContext }: AppProps) {
   const [navigation, setNavigation] = useState<NavigationState>(() =>
       createNavigationState(initialViewState),
     ),
     [viewport, setViewport] = useState<ViewportState>({ panX: 0, panY: 0, zoom: 1 }),
     [locate, setLocate] = useState<EntityReference | undefined>(),
-    [notice, setNotice] = useState<string>();
+    [notice, setNotice] = useState<string>(),
+    [decisionDetail, setDecisionDetail] = useState<DecisionDetailDescriptor>(),
+    [decisionLoading, setDecisionLoading] = useState(false);
   const rendererRef = useRef<VisualizationRenderer | null>(null);
+  const decisionRequest = useRef(0);
+  const effectiveDecisionService = useMemo(
+    () => decisionService ?? createDecisionService({ graph }),
+    [decisionService, graph],
+  );
   const state = navigation.current.viewState;
   const projection = useMemo(() => createVisualization(graph, state), [graph, state]);
   const information = useMemo(
@@ -123,6 +145,38 @@ export function App({ graph }: { readonly graph: GraphEngine }) {
     () => (selection ? getNavigationOptions(graph, selection) : undefined),
     [graph, selection],
   );
+  useEffect(() => {
+    const request = ++decisionRequest.current;
+    setDecisionDetail(undefined);
+    if (selection?.entityType !== "DecisionReference") {
+      setDecisionLoading(false);
+      return;
+    }
+    const node = graph.getNode("DecisionReference", selection.entityId);
+    if (!node.success) {
+      setDecisionLoading(false);
+      return;
+    }
+    const entity = graph.getEntity(node.value.key);
+    if (!entity.success) {
+      setDecisionLoading(false);
+      return;
+    }
+    const reference = entity.value as DecisionReference;
+    setDecisionLoading(true);
+    void effectiveDecisionService
+      .resolve(reference, getDecisionResolutionContext?.(reference))
+      .then((detail) => {
+        if (decisionRequest.current === request) setDecisionDetail(detail);
+      })
+      .catch(() => {
+        if (decisionRequest.current === request)
+          setNotice("Unexpected decision resolution failure.");
+      })
+      .finally(() => {
+        if (decisionRequest.current === request) setDecisionLoading(false);
+      });
+  }, [effectiveDecisionService, getDecisionResolutionContext, graph, selection]);
   const openOption = useCallback(
     (option: NavigationOption) => {
       if (selection)
@@ -249,6 +303,8 @@ export function App({ graph }: { readonly graph: GraphEngine }) {
         {information?.success ? (
           <InformationCard
             descriptor={information.value}
+            decisionLoading={decisionLoading}
+            {...(decisionDetail ? { decisionDetail } : {})}
             navigationOptions={options?.success ? options.options : []}
             onFocus={(reference) => navigate({ type: "FOCUS_ENTITY", target: asTarget(reference) })}
             onOpen={(reference) =>

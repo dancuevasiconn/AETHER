@@ -288,6 +288,19 @@ button.active {
 .information-card dd {
   margin: 0;
 }
+.decision-detail {
+  border-top: 1px solid #d6deea;
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+}
+.decision-detail h3,
+.decision-detail h4 {
+  margin: 0.5rem 0;
+}
+.decision-warnings {
+  color: #8a5900;
+  padding-left: 1.25rem;
+}
 .fatal {
   padding: 2rem;
 }
